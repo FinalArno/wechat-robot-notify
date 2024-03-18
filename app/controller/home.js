@@ -8,17 +8,22 @@ class HomeController extends Controller {
     let hours = time.hours();
     let minutes = time.minutes();
     let seconds = time.seconds();
-    console.log(
-      moment({ h: hours, m: minutes, s: seconds }).format("HH:mm:ss")
-    );
+    if (hours < 1) {
+      return moment({ m: minutes, s: seconds }).format("mm:ss");
+    }
+    return moment({ h: hours, m: minutes, s: seconds }).format("HH:mm:ss");
   }
   async pipelineHook(body, key) {
     let content = "";
     const {
-      object_attributes = {},
-      user = {},
-      project = {},
-      commit = {},
+      object_attributes = {
+        created_at: moment(),
+        finished_at: moment().add(1, "hour"),
+        ref: "testing",
+      },
+      user = { username: "arno" },
+      project = { name: "console" },
+      commit = { message: "none" },
     } = body;
     const { username } = user;
     const { name } = project;
@@ -26,10 +31,11 @@ class HomeController extends Controller {
     const { created_at, finished_at, status, detailed_status, ref } =
       object_attributes;
     if (status === "pending") {
-      content = `# Console 前端【**${name}**】${ref} 开始构建 \n <font color=666>构建人</font>：${username}\n <font color=666>最新提交</font>：${message}`;
+      content = `# Console前端【<font color="info">${name}</font>】${ref} 开始构建 \n \n<font color="comment">构建人</font>：${username}\n <font color="comment">最新提交</font>：${message}`;
     }
     if (detailed_status === "passed" || detailed_status === "failed") {
-      content = `# Console 前端【**${name}**】${ref} 构建完成 \n <font color=666>构建人</font>：${username}\n <font color=666>构建结果</font>：${detailed_status} \n <font color=666>构建用时</font>：${getDuration(
+      const color = detailed_status === "passed" ? "info" : "warning";
+      content = `# Console前端【<font color="info">${name}</font>】${ref} 构建完成 \n \n<font color="comment">构建人</font>：${username}\n <font color="comment">构建结果</font>：<font color="${color}">${detailed_status}</font> \n <font color="comment">构建用时</font>：${this.getDuration(
         created_at,
         finished_at
       )}`;
@@ -68,8 +74,6 @@ class HomeController extends Controller {
       ctx.body = "Hello Webhook";
       return;
     }
-    console.log("body---", body, query);
-    ctx.logger.info("some request data: %j", body, query);
     if (body.object_kind === "pipeline") {
       await this.pipelineHook(body, key);
       ctx.body = "Hello Webhook";
