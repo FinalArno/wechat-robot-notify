@@ -36,6 +36,7 @@ class HomeController extends Controller {
     const body = ctx.request.body;
     const query = ctx.request.query;
     console.log("body---", body, query);
+    ctx.logger.info("some request data: %j", body, query);
     if (body.event_type === "push_event") {
       await this.hook(body, query);
       ctx.body = "Hello Webhook";
