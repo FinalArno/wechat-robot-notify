@@ -31,11 +31,11 @@ class HomeController extends Controller {
     const { created_at, finished_at, status, detailed_status, ref } =
       object_attributes;
     if (status === "pending") {
-      content = `# Console前端【<font color="info">${name}</font>】${ref} 开始构建 \n \n<font color="comment">构建人</font>：${username}\n <font color="comment">最新提交</font>：${message}`;
+      content = `# Console前端 开始构建 \n \n<font color="comment">项目名称</font>：<font color="info">${name}</font>\n<font color="comment">构建分支</font>：${ref}\n<font color="comment">构建人</font>：${username}\n<font color="comment">最新提交</font>：${message}`;
     }
     if (detailed_status === "passed" || detailed_status === "failed") {
       const color = detailed_status === "passed" ? "info" : "warning";
-      content = `# Console前端【<font color="info">${name}</font>】${ref} 构建完成 \n \n<font color="comment">构建人</font>：${username}\n <font color="comment">构建结果</font>：<font color="${color}">${detailed_status}</font> \n <font color="comment">构建用时</font>：${this.getDuration(
+      content = `# Console前端 构建完成 \n \n<font color="comment">项目名称</font>：<font color="info">${name}</font>\n<font color="comment">构建分支</font>：${ref}\n<font color="comment">构建人</font>：${username}\n<font color="comment">构建结果</font>：<font color="${color}">${detailed_status}</font> \n<font color="comment">构建用时</font>：${this.getDuration(
         created_at,
         finished_at
       )}`;
