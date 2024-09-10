@@ -29,3 +29,11 @@ npm stop
 - Use `npm test` to run unit test.
 
 [egg]: https://eggjs.org
+
+## 部署服务器 arno001
+### 部署方式
+ - ssh arno001
+ - cd /usr/www
+ - git pull
+ - npm run stop
+ - npm run start
