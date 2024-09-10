@@ -1,30 +1,32 @@
-const { Controller } = require('egg');
-const moment = require('moment');
+const { Controller } = require("egg");
+const moment = require("moment");
 
-const NOTIFY_BRANCH_LIST = [ 'testing', 'staging', 'PEK2', 'QA_CLOUD', 'main' ];
+const NOTIFY_BRANCH_LIST = ["testing", "staging", "PEK2", "QA_CLOUD", "main"];
+const MAIN_CONSOLE_PROJECT_USER_LIST = ["lupingtu"];
+const MAIN_CONSOLE_PROJECT = "pitrix-webconsole";
 class HomeController extends Controller {
   getDuration(create, finish) {
     const duration = moment(finish).valueOf() - moment(create).valueOf();
-    const time = moment.duration(duration, 'millisecond'); // 得到一个对象，里面有对应的时分秒等时间对象值
+    const time = moment.duration(duration, "millisecond"); // 得到一个对象，里面有对应的时分秒等时间对象值
     const hours = time.hours();
     const minutes = time.minutes();
     const seconds = time.seconds();
     if (hours < 1) {
-      return moment({ m: minutes, s: seconds }).format('mm:ss');
+      return moment({ m: minutes, s: seconds }).format("mm:ss");
     }
-    return moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
+    return moment({ h: hours, m: minutes, s: seconds }).format("HH:mm:ss");
   }
   async pipelineHook(body, key) {
-    let content = '';
+    let content = "";
     const {
       object_attributes = {
         created_at: moment(),
-        finished_at: moment().add(1, 'hour'),
-        ref: 'testing',
+        finished_at: moment().add(1, "hour"),
+        ref: "testing",
       },
-      user = { username: 'arno' },
-      project = { name: 'console' },
-      commit = { message: 'none' },
+      user = { username: "arno" },
+      project = { name: "console" },
+      commit = { message: "none" },
     } = body;
     const { username } = user;
     const { name } = project;
@@ -35,18 +37,21 @@ class HomeController extends Controller {
     if (!NOTIFY_BRANCH_LIST.includes(ref)) {
       return;
     }
-    if (status === 'pending') {
+    if (ref === MAIN_CONSOLE_PROJECT && !MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)) {
+      return;
+    }
+    if (status === "pending") {
       content = `# Console前端 开始构建 \n \n<font color="comment">项目名称</font>：<font color="info">${name}</font>\n<font color="comment">构建分支</font>：${ref}\n<font color="comment">构建人</font>：${username}\n<font color="comment">最新提交</font>：${message}`;
     }
-    if (detailed_status === 'passed' || detailed_status === 'failed') {
-      const color = detailed_status === 'passed' ? 'info' : 'warning';
+    if (detailed_status === "passed" || detailed_status === "failed") {
+      const color = detailed_status === "passed" ? "info" : "warning";
       content = `# Console前端 构建完成 \n \n<font color="comment">项目名称</font>：<font color="info">${name}</font>\n<font color="comment">构建分支</font>：${ref}\n<font color="comment">构建人</font>：${username}\n<font color="comment">构建结果</font>：<font color="${color}">${detailed_status}</font> \n<font color="comment">构建用时</font>：${this.getDuration(
         created_at,
         finished_at
       )}`;
     }
     const data = {
-      msgtype: 'markdown',
+      msgtype: "markdown",
       markdown: {
         content,
       },
@@ -56,10 +61,10 @@ class HomeController extends Controller {
     await this.ctx.curl(
       `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${key}` /* 机器人的 webhook url */,
       {
-        method: 'POST',
-        contentType: 'json',
+        method: "POST",
+        contentType: "json",
         data,
-        dataType: 'json',
+        dataType: "json",
       }
     );
     return true;
@@ -67,7 +72,7 @@ class HomeController extends Controller {
 
   async index() {
     const { ctx } = this;
-    ctx.body = 'Hello Index';
+    ctx.body = "Hello Index";
   }
 
   async webhook() {
@@ -76,14 +81,14 @@ class HomeController extends Controller {
     const query = ctx.request.query;
     const { key } = query;
     if (!key) {
-      ctx.body = 'Hello Webhook';
+      ctx.body = "Hello Webhook";
       return;
     }
-    if (body.object_kind === 'pipeline') {
+    if (body.object_kind === "pipeline") {
       await this.pipelineHook(body, key);
-      ctx.body = 'Hello Webhook';
+      ctx.body = "Hello Webhook";
     } else {
-      ctx.body = 'Hello Webhook';
+      ctx.body = "Hello Webhook";
     }
   }
 }
