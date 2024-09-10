@@ -37,7 +37,7 @@ class HomeController extends Controller {
     if (!NOTIFY_BRANCH_LIST.includes(ref)) {
       return;
     }
-    if (ref === MAIN_CONSOLE_PROJECT && !MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)) {
+    if (name === MAIN_CONSOLE_PROJECT && !MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)) {
       return;
     }
     if (status === "pending") {
