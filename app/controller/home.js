@@ -3,7 +3,7 @@ const moment = require("moment");
 
 const NOTIFY_BRANCH_LIST = ["testing", "staging", "PEK2", "QA_CLOUD", "main"];
 const MAIN_CONSOLE_PROJECT_USER_LIST = ["lupingtu"];
-const MAIN_CONSOLE_PROJECT = "pitrix-webconsole";
+const BILLING_SUB_PORTAL = "pitrix-webconsole-billing";
 class HomeController extends Controller {
   getDuration(create, finish) {
     const duration = moment(finish).valueOf() - moment(create).valueOf();
@@ -37,7 +37,10 @@ class HomeController extends Controller {
     if (!NOTIFY_BRANCH_LIST.includes(ref)) {
       return;
     }
-    if (!MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)) {
+    if (
+      name !== BILLING_SUB_PORTAL &&
+      !MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)
+    ) {
       return;
     }
     if (status === "pending") {
