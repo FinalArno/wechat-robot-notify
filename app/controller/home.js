@@ -41,7 +41,7 @@ class HomeController extends Controller {
       return;
     }
     if (
-      BILLING_SUB_PORTAL.includes(name)&&
+      !BILLING_SUB_PORTAL.includes(name)&&
       !MAIN_CONSOLE_PROJECT_USER_LIST.includes(username)
     ) {
       return;
